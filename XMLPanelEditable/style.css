@@ -1,0 +1,14 @@
+
+span.fxe_editable {
+	background-color: rgb(0,190,190);
+	filter:alpha(opacity=60);
+}
+
+span.fxe_editable_a {
+	background-color: rgb(190,190,0);
+}
+
+span.node_notEditable {
+	background-color: grey;
+	filter:alpha(opacity=60);
+}

@@ -1,0 +1,61 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+<title>XML Editor</title>
+<script type="text/javascript" src="config.js"></script> <!-- config -->
+
+<link rel="stylesheet" type="text/css"	href="ContentEditor/styles/editor.css" />
+<link rel="stylesheet" type="text/css"	href="XMLPanelEditable/style.css" />
+
+<link rel="stylesheet" type="text/css"	href="examples/tree.css" />
+
+<link rel="stylesheet" type="text/css"	href="ext/resources/css/ext-all.css" /> <!-- default Ext CSS -->
+<script type="text/javascript"	src="ext/adapter/ext/ext-base.js"></script> <!-- default Ext Base -->
+<script type="text/javascript" src="ext/ext-all.js"></script> <!-- default Ext all -->
+<script type="text/javascript" src="columnfit.js"></script> <!-- ColumnFit layout -->
+<script type="text/javascript" src="xml_viewport.js"></script>
+
+<!-- stuff needed for XML editting -->
+<script type="text/javascript" src="ContentEditor/ContentEditor.js"></script> <!-- Editor to handle PanelEditable panels -->
+<script type="text/javascript" src="ContentEditor/PanelEditable.js"></script> <!-- Ext.Panel that is editable with connection to Editor -->
+<script type="text/javascript" src="XMLPanelEditable/XMLAux.js"></script> <!-- prerequirements for handling XML files -->
+<script type="text/javascript" src="XMLPanelEditable/XMLController.js"></script> <!-- controller for XMLPanelEditable -->
+<script type="text/javascript" src="XMLPanelEditable/XMLPanelEditable.js"></script> <!-- XML View that is based on PanelEditable -->
+<!-- ============================= -->
+
+
+<script type="text/javascript">
+
+function updateXPath(dom, pos, xpath) {
+	Ext.get("xpath").dom.innerHTML = xpath;
+}
+
+function main() {
+	var xmlcontroller = new XMLController();
+	xmlcontroller.loadXMLurl(src); //if more transformations: applied from left to right
+
+	ContentEditor.init(xmlcontroller); //ContentEditor has to keep pointer for our main epanel for purpose to issue calls like updateElement, etc
+	
+	var xmlpaneleditable = createViewport(xmlcontroller);
+	
+	xmlpaneleditable[0].loadXSLTurl(file1); //if more transformations: applied from left to right
+	xmlpaneleditable[1].loadXSLTurl(file2);	
+	xmlpaneleditable[2].loadXSLTurl(file3);
+
+	/* Have to add view before loading XSLT! as loadXSLT implicitly requires access to markers that are kept in controller */
+	xmlcontroller.addView(xmlpaneleditable[0]);
+	xmlcontroller.addView(xmlpaneleditable[1]);
+	xmlcontroller.addView(xmlpaneleditable[2]);
+	
+	ContentEditor.positionChanges = updateXPath;
+}
+
+Ext.onReady(main);
+
+</script>
+
+</head>
+<body>
+	<div id="viewport"></div>
+</body>
+</html>

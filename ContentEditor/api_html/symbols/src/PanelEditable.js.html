@@ -1,0 +1,223 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/*
+<span class='line'>  2</span>     This program is free software: you can redistribute it and/or modify
+<span class='line'>  3</span>     it under the terms of the GNU General Public License as published by
+<span class='line'>  4</span>     the Free Software Foundation, either version 3 of the License, or
+<span class='line'>  5</span>     any later version.
+<span class='line'>  6</span> 
+<span class='line'>  7</span>     This program is distributed in the hope that it will be useful,
+<span class='line'>  8</span>     but WITHOUT ANY WARRANTY; without even the implied warranty of
+<span class='line'>  9</span>     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+<span class='line'> 10</span>     GNU General Public License for more details.
+<span class='line'> 11</span> 
+<span class='line'> 12</span>     You should have received a copy of the GNU General Public License
+<span class='line'> 13</span>     along with this program.  If not, see &lt;http://www.gnu.org/licenses/>.
+<span class='line'> 14</span> */</span><span class="WHIT">
+<span class='line'> 15</span> 
+<span class='line'> 16</span> </span><span class="COMM">/**
+<span class='line'> 17</span>  * @fileOverview File defines a basic editable component based on Ext.Panel
+<span class='line'> 18</span>  * @author Grzegorz Dymarek gd58@alumni.st-andrews.ac.uk
+<span class='line'> 19</span>  * @version 0.1 (13/07/2009)
+<span class='line'> 20</span>  */</span><span class="WHIT">
+<span class='line'> 21</span> </span><span class="WHIT"> 
+<span class='line'> 22</span> </span><span class="COMM">/**
+<span class='line'> 23</span>  * @description Basic Ext component that is editable with REDO/UNDO support; extends Ext.Panel&lt;BR/>
+<span class='line'> 24</span>  * Any content can be made editable by:&lt;BR/>
+<span class='line'> 25</span>  * 1) {@link #initContent} to place some content within the panel&lt;BR/>
+<span class='line'> 26</span>  * 2) {@link #process} to prepare nodes&lt;BR/>
+<span class='line'> 27</span>  * 3) {@link #makeEditable} to notify ContentEditor&lt;BR/>
+<span class='line'> 28</span>  * @class PanelEditable
+<span class='line'> 29</span>  * @constructor
+<span class='line'> 30</span>  * @requires Ext.Panel {@link ContentEditor}
+<span class='line'> 31</span>  * @extends Ext.Panel
+<span class='line'> 32</span>  */</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">PanelEditable</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Ext.extend</span><span class="PUNC">(</span><span class="NAME">Ext.Panel</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="COMM">/** @lends PanelEditable.prototype */</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">	
+<span class='line'> 36</span> 	</span><span class="NAME">content</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">	</span><span class="NAME">snapshot</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="COMM">/** @type Array of strings
+<span class='line'> 39</span> 	 * @description node attribute that ContentEditor looks for to make a node editable;&lt;BR/>
+<span class='line'> 40</span> 	 * Can have more markers; however only the first one (if set) indicates 'editability'; the reminder is passed over to {@link .updateElement} - can be used to unique identification of editable nodes
+<span class='line'> 41</span> 	 * Note! only textnodes can be made editable
+<span class='line'> 42</span> 	 */</span><span class="WHIT">
+<span class='line'> 43</span> </span><span class="WHIT">	</span><span class="NAME">marker</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">'myEditable'</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> 
+<span class='line'> 44</span> 	</span><span class="COMM">/** @type Array of strings
+<span class='line'> 45</span> 	 * @description Depending on marker set bound to a node, ContentEditor sets nodes CSS names taken from the array
+<span class='line'> 46</span> 	 */</span><span class="WHIT">
+<span class='line'> 47</span> </span><span class="WHIT">	</span><span class="NAME">markerClassName</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="STRN">'cssMyEditable'</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 48</span> </span><span class="WHIT">	
+<span class='line'> 49</span> 	</span><span class="COMM">/**
+<span class='line'> 50</span> 	* @ignore
+<span class='line'> 51</span> 	* @description initializes component; please see Ext.Panel for more information
+<span class='line'> 52</span> 	*/</span><span class="WHIT">	
+<span class='line'> 53</span> 	</span><span class="NAME">initComponent</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">		</span><span class="NAME">PanelEditable.superclass.initComponent.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">		</span><span class="NAME">this.content</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.createElement</span><span class="PUNC">(</span><span class="STRN">"div"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">		</span><span class="NAME">this.contentEl</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.content</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 58</span> 
+<span class='line'> 59</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 60</span> 	* @description Adds content to the component
+<span class='line'> 61</span> 	* @param {DOM/DOM string} content content to be placed within the panel
+<span class='line'> 62</span> 	*/</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">	</span><span class="NAME">initContent</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">content</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">content.nodeType</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">			</span><span class="NAME">this.content.appendChild</span><span class="PUNC">(</span><span class="NAME">content</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">		</span><span class="KEYW">else</span><span class="WHIT"> </span><span class="NAME">this.content.innerHTML</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">content</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">	
+<span class='line'> 69</span> 	</span><span class="COMM">/**
+<span class='line'> 70</span> 	* @description Initializes snapshots
+<span class='line'> 71</span> 	* Function called by makeEditable
+<span class='line'> 72</span> 	*/</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">	</span><span class="NAME">initSnapshot</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Array</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot.current_snap_pos</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">undefined</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 77</span> 
+<span class='line'> 78</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 79</span> 	* @description Function to refresh/regenerate current content.
+<span class='line'> 80</span> 	* Usually not used!
+<span class='line'> 81</span> 	* &lt;BR/>Interface function.
+<span class='line'> 82</span> 	*/</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">	</span><span class="NAME">refreshContent</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">	
+<span class='line'> 86</span> 	</span><span class="COMM">/**
+<span class='line'> 87</span> 	* @description
+<span class='line'> 88</span> 	* Function called by ContentEditor every time an editable element is changed
+<span class='line'> 89</span> 	* @param {string} value new value
+<span class='line'> 90</span> 	* @param {} markers identification of the node as set by {@link #process} (marker value) {@link #marker}
+<span class='line'> 91</span> 	*/</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">	</span><span class="NAME">updateElement</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="COMM">/*value + values for each of the markers*/</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">		</span><span class="COMM">/* Suggestion:
+<span class='line'> 94</span> 		* 1) store caret position
+<span class='line'> 95</span> 		* 2) remove caret
+<span class='line'> 96</span> 		* 3) update value
+<span class='line'> 97</span> 		* 4) place caret back
+<span class='line'> 98</span> 		*/</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">caret</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ContentEditor.getCaretDetails</span><span class="PUNC">(</span><span class="NAME">this.content</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">		</span><span class="COMM">/*...*/</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">		
+<span class='line'>102</span> 		</span><span class="NAME">ContentEditor.displayCaret</span><span class="PUNC">(</span><span class="NAME">caret</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">		</span><span class="NAME">this.addSnapshot</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">	
+<span class='line'>106</span> 	</span><span class="COMM">/**
+<span class='line'>107</span> 	* @description function to store current state of the document for the purpose of UNDO/REDO&lt;BR/>
+<span class='line'>108</span> 	* Should be called from {@link #updateElement}
+<span class='line'>109</span> 	*/</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">	</span><span class="NAME">addSnapshot</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">this.snapshot.current_snap_pos</span><span class="PUNC">!=</span><span class="NAME">undefined</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">			</span><span class="NAME">this.snapshot.trim</span><span class="PUNC">(</span><span class="NAME">this.snapshot.current_snap_pos</span><span class="PUNC">+</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>114</span> 
+<span class='line'>115</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.snapshot.length</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot</span><span class="PUNC">[</span><span class="NAME">pos</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Object</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">snap</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.content.cloneNode</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot</span><span class="PUNC">[</span><span class="NAME">pos</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">snap</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">snap</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot.current_snap_pos</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">pos</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>120</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">	
+<span class='line'>122</span> 	</span><span class="COMM">/**
+<span class='line'>123</span> 	* @description Retrieves stored snapshot and replace current document
+<span class='line'>124</span> 	* @param {int} step The snapshot to use relative to the current state
+<span class='line'>125</span> 	*/</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">	</span><span class="NAME">recallSnapshot</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">step</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">s_n</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.snapshot.current_snap_pos</span><span class="PUNC">+</span><span class="NAME">step</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">s_n</span><span class="PUNC">>=</span><span class="NAME">this.snapshot.length</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">s_n</span><span class="PUNC">&lt;</span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ptr</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.snapshot</span><span class="PUNC">[</span><span class="NAME">s_n</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">		</span><span class="NAME">this.snapshot.current_snap_pos</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">s_n</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">		</span><span class="NAME">removeAllChildren</span><span class="PUNC">(</span><span class="NAME">this.content</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">		
+<span class='line'>134</span> 		</span><span class="COMM">/* dont add the whole snapshot but only the inner part of it! */</span><span class="WHIT">
+<span class='line'>135</span> </span><span class="WHIT">		</span><span class="COMM">/* have to keet this.content element intacked as it might be bound to something else in Ext.Panel? */</span><span class="WHIT">
+<span class='line'>136</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">ptr.snap.childNodes.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>137</span> </span><span class="WHIT">			</span><span class="NAME">this.initContent</span><span class="PUNC">(</span><span class="NAME">ptr.snap.childNodes</span><span class="PUNC">[</span><span class="NAME">i</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">cloneNode</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>138</span> </span><span class="WHIT">		
+<span class='line'>139</span> 		</span><span class="NAME">ContentEditor.bindCaret</span><span class="PUNC">(</span><span class="NAME">this.content</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="COMM">//will be bound only if exists</span><span class="WHIT">
+<span class='line'>140</span> </span><span class="WHIT">		</span><span class="COMM">//since a snapshot is a copy any hashTable to store id's etc has to be rebuild!</span><span class="WHIT">
+<span class='line'>141</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>142</span> </span><span class="WHIT">	
+<span class='line'>143</span> 	</span><span class="COMM">/** 
+<span class='line'>144</span> 	* @description returns copy of the current document
+<span class='line'>145</span> 	* @returns {DOM} copy of the current document
+<span class='line'>146</span> 	*/</span><span class="WHIT">
+<span class='line'>147</span> </span><span class="WHIT">	</span><span class="NAME">getDom</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>148</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.content</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>149</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ret_dom</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.content.cloneNode</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>150</span> </span><span class="WHIT">		</span><span class="NAME">ret_dom</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">ContentEditor.removeHooks</span><span class="PUNC">(</span><span class="NAME">ret_dom</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>151</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">ret_dom</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>152</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>153</span> </span><span class="WHIT">	
+<span class='line'>154</span> 	</span><span class="COMM">/**
+<span class='line'>155</span> 	* @description prints into console the copy of the current document
+<span class='line'>156</span> 	*/</span><span class="WHIT">	
+<span class='line'>157</span> 	</span><span class="NAME">output</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>158</span> </span><span class="WHIT">		</span><span class="NAME">console.log</span><span class="PUNC">(</span><span class="NAME">this.getDom</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>159</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>160</span> </span><span class="WHIT">	
+<span class='line'>161</span> 	
+<span class='line'>162</span> 	</span><span class="COMM">/**
+<span class='line'>163</span> 	* @description returns the container of a node that is scrollable
+<span class='line'>164</span> 	* @default null
+<span class='line'>165</span> 	* @returns scrollabel component
+<span class='line'>166</span> 	*/</span><span class="WHIT">	
+<span class='line'>167</span> 	</span><span class="NAME">getScrollable</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>168</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Ext.get</span><span class="PUNC">(</span><span class="NAME">this.content</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">up</span><span class="PUNC">(</span><span class="STRN">"div.x-panel-body"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>169</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>170</span> </span><span class="WHIT">	
+<span class='line'>171</span> 	</span><span class="COMM">/**
+<span class='line'>172</span> 	* @description processes the current document in order to append markers
+<span class='line'>173</span> 	* Note! Editable nodes have to be wrapped using span with a marker!
+<span class='line'>174</span> 	* @param {DOM} root DOM node to process
+<span class='line'>175</span> 	*/</span><span class="WHIT">
+<span class='line'>176</span> </span><span class="WHIT">	</span><span class="NAME">process</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">root</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>177</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">root</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>178</span> </span><span class="WHIT">	
+<span class='line'>179</span> 		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">root.nodeType</span><span class="PUNC">==</span><span class="NUMB">3</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT"> </span><span class="COMM">//for each textNode wrap it into a span with marker!</span><span class="WHIT">
+<span class='line'>180</span> </span><span class="WHIT">			</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.createElement</span><span class="PUNC">(</span><span class="STRN">'span'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>181</span> </span><span class="WHIT">			</span><span class="NAME">x.appendChild</span><span class="PUNC">(</span><span class="NAME">root.cloneNode</span><span class="PUNC">(</span><span class="KEYW">true</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>182</span> </span><span class="WHIT">			</span><span class="NAME">x.setAttribute</span><span class="PUNC">(</span><span class="NAME">this.marker</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>183</span> </span><span class="WHIT">			</span><span class="NAME">root.parentNode.replaceChild</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">root</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>184</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>185</span> </span><span class="WHIT">		</span><span class="COMM">//textNode has not children so</span><span class="WHIT">
+<span class='line'>186</span> </span><span class="WHIT">		</span><span class="COMM">//implicit else</span><span class="WHIT">
+<span class='line'>187</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">c</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">root.childNodes</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>188</span> </span><span class="WHIT">		</span><span class="KEYW">for</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">i</span><span class="PUNC">=</span><span class="NUMB">0</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">&lt;</span><span class="NAME">c.length</span><span class="PUNC">;</span><span class="NAME">i</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'>189</span> </span><span class="WHIT">			</span><span class="NAME">this.process</span><span class="PUNC">(</span><span class="NAME">c.item</span><span class="PUNC">(</span><span class="NAME">i</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>190</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>191</span> </span><span class="WHIT">	
+<span class='line'>192</span> 	</span><span class="COMM">/**
+<span class='line'>193</span> 	* @description method makes a node being editable&lt;BR/>
+<span class='line'>194</span> 	* Note! content has to be prepared in order to make it Editable&lt;BR/>
+<span class='line'>195</span> 	* Can implement own function that wrapes editable nodes with spans
+<span class='line'>196</span> 	* and gives them attribute marker[0]&lt;BR/>
+<span class='line'>197</span> 	* Please see: {@link #process}
+<span class='line'>198</span> 	*/</span><span class="WHIT">
+<span class='line'>199</span> </span><span class="WHIT">	</span><span class="NAME">makeEditable</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>200</span> </span><span class="WHIT">		</span><span class="NAME">ContentEditor.makeEditable.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">this.content</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>201</span> </span><span class="WHIT">		
+<span class='line'>202</span> 		</span><span class="NAME">this.initSnapshot</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>203</span> </span><span class="WHIT">		</span><span class="NAME">this.addSnapshot</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>204</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>205</span> </span><span class="WHIT">	
+<span class='line'>206</span> 	</span><span class="COMM">/**
+<span class='line'>207</span> 	* @description unhooks any events bound to current content&lt;BR/>
+<span class='line'>208</span> 	* method usually used when re-processing content
+<span class='line'>209</span> 	*/</span><span class="WHIT">
+<span class='line'>210</span> </span><span class="WHIT">	</span><span class="NAME">unhook</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>211</span> </span><span class="WHIT">		</span><span class="NAME">ContentEditor.unhook.apply</span><span class="PUNC">(</span><span class="KEYW">this</span><span class="PUNC">,</span><span class="PUNC">[</span><span class="NAME">this.content</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>212</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">	
+<span class='line'>213</span> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>214</span> 
+<span class='line'>215</span> </span><span class="NAME">Ext.reg</span><span class="PUNC">(</span><span class="STRN">'paneleditable'</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">PanelEditable</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT"> 
+<span class='line'>216</span> </span></pre></body></html>

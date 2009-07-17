@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<news>
+  <header>
+    <headline>
+    Factonomy - Powerful technology, simply applied 
+    </headline>
+   <byline>
+    By Factonomy Ltd. &amp; Grzegorz Dymarek
+    </byline>
+    <dateline>
+      <location>Stuart House, Esmills Park, Musselburgh EH21 7PQ, UK</location>
+      <date>17 July 2009</date>
+    </dateline>
+  </header>
+
+  <story>
+<p>
+ Founded in 2003 by Graeme Bryce and Dave Reynolds, Factonomy licenses its technology framework to companies to help them reduce the time and cost it takes to develop applications.
+
+Factonomy's agile software environment enables the rapid development of web-enabled business applications using declarative XML only.
+
+Unlike other development platforms, the Factonomy Framework allows developers to work independently on functionality, content and style, providing a coherent end-to-end environment so they can deliver solutions which are flexible and cost effective. 
+</p>    
+<p><span>Located online at </span><url>www.factonomy.com</url><span>.
+ Factonomy is a member of the Microsoft Partner Research Panel. The Factonomy Framework operates within the Microsoft.NET environment and makes extensive use of Windows Workflow Foundation, Windows Communications Foundation and the core presentation technologies around WPF and Silverlight.
+</span><quote>
+Factonomy's technology significantly reduces the time and cost involved for businesses to develop an enterprise level data governance strategy," says Mark Taylor, Director of Developer and Platform Evangelism, Microsoft Ltd. "Adopting the Factonomy Framework allows businesses to build on operational goals, such as managing their information as a strategic asset, as well as managing data risk, ensuring they can conform with often complex and numerous data related compliance requirements.</quote>.</p>
+  </story>
+</news>
+

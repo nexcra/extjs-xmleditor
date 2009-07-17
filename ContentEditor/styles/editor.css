@@ -1,0 +1,19 @@
+span.fxe_caret {
+	position:relative; //relative, static, absolute
+	top:0;
+	left:0;
+	background-color: #000;
+	width:1px;
+	z-index:10;
+	margin:0;
+	display: inherit;
+	padding:0;
+}
+
+pre {
+	white-space: pre-wrap;       /* css-3 */
+	white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}

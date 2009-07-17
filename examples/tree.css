@@ -1,0 +1,11 @@
+#fxe_treeview     { font-size:12px; font-family:Verdana; margin:1em 1em 1em 0; color:black; }
+
+#fxe_treeview u   { text-decoration: none; color: blue; }
+#fxe_treeview a   { text-decoration: none; color: #990000; }
+#fxe_treeview em  { font-style: normal; color: red; }
+#fxe_treeview div { margin: 0em; padding: 0em 0em 0em 1em; text-indent: 0em }
+#fxe_treeview p   { margin: 0em; padding: 0em; text-indent: 0em }
+
+#fxe_treeview .fxeTreeviewExpander   { display:inline-block; width:10px; cursor:hand; font-size:14px; line-height:12px; color: blue;}
+#fxe_treeview .fxeTreeviewCollapser  { display:inline-block; width:10px; cursor:hand; font-size:10px; color: blue; }
+#fxe_treeview .fxeTreeviewExpandable .fxeTreeviewLeftmargin { margin-left:10px; }
