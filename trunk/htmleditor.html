@@ -1,0 +1,41 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+<title>Editor</title>
+
+<link rel="stylesheet" type="text/css"	href="ContentEditor/styles/editor.css" />
+
+<link rel="stylesheet" type="text/css"	href="ext/resources/css/ext-all.css" /> <!-- default Ext CSS -->
+<script type="text/javascript"	src="ext/adapter/ext/ext-base.js"></script> <!-- default Ext Base -->
+<script type="text/javascript" src="ext/ext-all.js"></script> <!-- default Ext all -->
+<script type="text/javascript" src="columnfit.js"></script> <!-- ColumnFit layout -->
+<script type="text/javascript" src="html_viewport.js"></script>
+
+<!-- stuff needed for XML editting -->
+<script type="text/javascript" src="ContentEditor/ContentEditor.js"></script> <!-- Editor to handle PanelEditable panels -->
+<script type="text/javascript" src="ContentEditor/PanelEditable.js"></script> <!-- Ext.Panel that is editable with connection to Editor -->
+<!-- ============================= -->
+
+
+<script type="text/javascript">
+
+
+function main() {
+	var panel = createViewport();
+	
+	ContentEditor.init(panel);
+	
+	panel.initContent("Hello World!<BR/><B>Try to edit me!</B><BR/>You can modify me easily<BR/>However, you are not allowed to change my structure!");
+	panel.process(panel.content);
+	panel.makeEditable();	
+}
+
+Ext.onReady(main);
+
+</script>
+
+</head>
+<body>
+	<div id="viewport"></div>
+</body>
+</html>
